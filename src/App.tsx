@@ -1,5 +1,4 @@
 import { useRef, useState } from 'react';
-import reactLogo from './assets/react.svg';
 import {
   Box,
   Button,
@@ -34,11 +33,18 @@ function App() {
   const [map, setMap] = useState<google.maps.Map>({} as google.maps.Map);
   const [directionsResponse, setDirectionResponse] =
     useState<google.maps.DirectionsResult>();
-  const [distance, setDistance] = useState<string>();
-  const [estDuration, setEstDuration] = useState<string>();
+  const [tripDetails, setTripDetails] = useState<{
+    distance?: string;
+    estDuration?: string;
+  }>({
+    distance: '',
+    estDuration: '',
+  });
+
   const [loadingBtn, setLoadingBtn] = useState(false);
+
   const { isLoaded } = useJsApiLoader({
-    googleMapsApiKey: import.meta.env.VITE_REACT_APP_GOOGLE_MAPS_API_KEY,
+    googleMapsApiKey: import.meta.env.VITE_REACT_APP_GOOGLE_MAPS_API_KEY, // Enter your API key in .env file to use
     libraries,
   });
 
@@ -55,18 +61,28 @@ function App() {
       origin: originRef.current.value,
       destination: destRef.current.value,
       travelMode: google.maps.TravelMode.DRIVING,
+      transitOptions: {
+        arrivalTime: null,
+        departureTime: new Date(),
+      },
     });
 
     setDirectionResponse(results);
-    setDistance(results.routes[0].legs[0].distance?.text);
-    setEstDuration(results.routes[0].legs[0].duration?.text);
+
+    setTripDetails({
+      distance: results.routes[0].legs[0].distance?.text,
+      estDuration: results.routes[0].legs[0].duration?.text,
+    });
+
     map.setZoom(10);
   };
 
   const clearRoute = () => {
     setDirectionResponse(undefined);
-    setDistance('');
-    setEstDuration('');
+    setTripDetails({
+      estDuration: '',
+      distance: '',
+    });
     // @ts-ignore
     originRef.current.value = '';
     // @ts-ignore
@@ -136,11 +152,17 @@ function App() {
           <Box w='100%'>
             <HStack>
               <Text>Distance:</Text>
-              <em> {!distance ? 'unavailable' : distance}</em>
+              <em>
+                {!tripDetails.distance ? 'unavailable' : tripDetails.distance}
+              </em>
             </HStack>
             <HStack>
               <Text>Est. Duration:</Text>
-              <em>{!estDuration ? 'unavailable' : estDuration}</em>
+              <em>
+                {!tripDetails.estDuration
+                  ? 'unavailable'
+                  : tripDetails.estDuration}
+              </em>
             </HStack>
           </Box>
         </VStack>
