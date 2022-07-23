@@ -1,6 +1,6 @@
 import { Heading, HStack, Link, VStack } from '@chakra-ui/react';
 import { FC, ReactNode } from 'react';
-import reactLogo from './../assets/react.svg';
+
 
 interface Props {
   children: ReactNode;
@@ -17,10 +17,10 @@ const AppContainer: FC<Props> = ({ children, aside }) => {
         w='100%'
         justifyContent='space-around'
       >
-        <Link href='/' display='inline-flex'>
-          <img src={reactLogo} className='logo react' alt='React logo' />
-          {'  '}
-          <Heading as='h2'>Path Finder</Heading>
+        <Link href='/' display='inline-flex' textDecoration='none'>
+          <Heading as='h2' color='purple'>
+            Path Finder
+          </Heading>
         </Link>
       </HStack>
       <HStack
@@ -34,7 +34,7 @@ const AppContainer: FC<Props> = ({ children, aside }) => {
           as='form'
           h='100%'
           minW={350}
-          maxW={600}
+          maxW={400}
           borderRightWidth={1}
           p={10}
         >

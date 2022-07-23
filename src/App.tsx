@@ -1,10 +1,4 @@
-import {
-  LegacyRef,
-  MutableRefObject,
-  useCallback,
-  useRef,
-  useState,
-} from 'react';
+import { useRef, useState } from 'react';
 import reactLogo from './assets/react.svg';
 import {
   Box,
@@ -28,6 +22,7 @@ import {
   Autocomplete,
   DirectionsRenderer,
 } from '@react-google-maps/api';
+import { ArrowRightIcon } from '@chakra-ui/icons';
 
 const lng = -0.1275;
 const lat = 51.5072;
@@ -41,6 +36,7 @@ function App() {
     useState<google.maps.DirectionsResult>();
   const [distance, setDistance] = useState<string>();
   const [estDuration, setEstDuration] = useState<string>();
+  const [loadingBtn, setLoadingBtn] = useState(false);
   const { isLoaded } = useJsApiLoader({
     googleMapsApiKey: import.meta.env.VITE_REACT_APP_GOOGLE_MAPS_API_KEY,
     libraries,
@@ -82,26 +78,46 @@ function App() {
   const Aside = () => {
     return (
       <>
-        <Heading as='h2' fontSize={24}>
-          Create a new Journey
+        <Heading as='h2' fontSize={24} color='purple'>
+          Find Your Path
         </Heading>
+        <Text my={16} fontSize={12}>
+          Whether you're looking to PathFinder as a driver or a passenger,
+          listing your journey is the best way to find a match.
+        </Text>
         <FormControl>
           <FormLabel>Origin</FormLabel>
           <Autocomplete>
-            <Input type='text' ref={originRef} />
+            <Input
+              type='text'
+              ref={originRef}
+              _focusVisible={{
+                borderColor: 'purple',
+                boxShadow: '0 0 0 1px purple',
+              }}
+            />
           </Autocomplete>
           <FormHelperText>e.g New York, NY</FormHelperText>
         </FormControl>
         <FormControl>
           <FormLabel>Destination</FormLabel>
           <Autocomplete>
-            <Input type='text' ref={destRef} />
+            <Input
+              shadow='none'
+              type='text'
+              ref={destRef}
+              colorScheme='purple'
+              _focusVisible={{
+                borderColor: 'purple',
+                boxShadow: '0 0 0 1px purple',
+              }}
+            />
           </Autocomplete>
           <FormHelperText>e.g California, CA</FormHelperText>
         </FormControl>
         <Spacer justifyContent='space-between' w='1' gap={[8, 8]} flex={0}>
           <Button variant='solid' colorScheme='purple' onClick={calculateRoute}>
-            Calculate Route
+            Find Route
           </Button>
           <Button
             mt={15}
@@ -118,20 +134,49 @@ function App() {
             Trip Details
           </Text>
           <Box w='100%'>
-            <Text>
-              Distance: <em>{'  ' + distance ?? 'unavailable'}</em>
-            </Text>
-            <Text>
-              Est. Duration: <em>{'  ' + estDuration ?? 'unavailable'}</em>
-            </Text>
+            <HStack>
+              <Text>Distance:</Text>
+              <em> {!distance ? 'unavailable' : distance}</em>
+            </HStack>
+            <HStack>
+              <Text>Est. Duration:</Text>
+              <em>{!estDuration ? 'unavailable' : estDuration}</em>
+            </HStack>
           </Box>
         </VStack>
+        <HStack pos='relative' bottom={-10}>
+          <Button
+            variant='outline'
+            colorScheme='purple'
+            rightIcon={<ArrowRightIcon />}
+            isLoading={loadingBtn}
+            loadingText='Fetching tripsters...'
+            onClick={() => {
+              setLoadingBtn(true);
+              setTimeout(() => {
+                setLoadingBtn(false);
+              }, 2000);
+            }}
+          >
+            Discover Other Tripsters like you
+          </Button>
+        </HStack>
       </>
     );
   };
 
   if (!isLoaded) {
-    return <Spinner />;
+    return (
+      <VStack
+        bg='purple'
+        pos='relative'
+        w='100%'
+        h='100vh'
+        justifyContent='center'
+      >
+        <Spinner color='white' />
+      </VStack>
+    );
   }
 
   const onLoad = (map: google.maps.Map) => {
