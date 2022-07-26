@@ -83,9 +83,8 @@ function App() {
       estDuration: '',
       distance: '',
     });
-    // @ts-ignore
+
     originRef.current.value = '';
-    // @ts-ignore
     destRef.current.value = '';
     map.panTo(center);
     map.setZoom(15);
